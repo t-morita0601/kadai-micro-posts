@@ -1,3 +1,6 @@
+import com.typesafe.config.{ Config, ConfigFactory }
+import scala.collection.JavaConverters._
+
 name := """micro-posts"""
 organization := "com.example"
 
@@ -21,8 +24,16 @@ libraryDependencies ++= Seq(
   "mysql"                  % "mysql-connector-java"          % "6.0.6",
   "org.flywaydb"           %% "flyway-play"                  % "4.0.0"
 )
-// Adds additional packages into Twirl
-//TwirlKeys.templateImports += "com.example.controllers._"
 
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "com.example.binders._"
+lazy val envConfig = settingKey[Config]("env-config")
+
+envConfig := {
+  val env = sys.props.getOrElse("env", "dev")
+  ConfigFactory.parseFile(file("env") / (env + ".conf"))
+}
+
+flywayLocations := envConfig.value.getStringList("flywayLocations").asScala
+flywayDriver := envConfig.value.getString("jdbcDriver")
+flywayUrl := envConfig.value.getString("jdbcUrl")
+flywayUser := envConfig.value.getString("jdbcUserName")
+flywayPassword := envConfig.value.getString("jdbcPassword")
