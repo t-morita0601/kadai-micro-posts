@@ -1,0 +1,7 @@
+@(currentUser: User, microPosts: PagedItems[MicroPost])(implicit messagesProvider: MessagesProvider, flash: Flash, request: RequestHeader)
+
+@main(Messages("Favorites"), Some(currentUser)) {
+
+    @views.html.favorites.micro_posts(currentUser, microPosts)
+
+}

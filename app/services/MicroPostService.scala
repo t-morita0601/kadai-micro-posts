@@ -12,6 +12,10 @@ trait MicroPostService {
 
   def deleteById(microPostId: Long)(implicit dbSession: DBSession = AutoSession): Try[Int]
 
+  def updateFavoriteFlag(microPostId: Long, favoriteFlag: Boolean, favoritedId: Long)(implicit dbSession: DBSession = AutoSession): Try[Int]
+
+  def findByFavorite(pagination: Pagination)(implicit dbSession: DBSession = AutoSession): Try[PagedItems[MicroPost]]
+
   def findByUserId(pagination: Pagination, userId: Long)(
     implicit dbSession: DBSession = AutoSession
   ): Try[PagedItems[MicroPost]]

@@ -28,6 +28,28 @@
                     }
                     </div>
                 }
+                @* お気に入り用フォーム *@
+                @if(currentUser.id.get != micropost.userId) {
+                    @if(micropost.favorite_flag && currentUser.id.get == micropost.favorited_id) {
+                        <div>
+                        @b3.formCSRF(routes.PostController.updateFavoriteFlag(micropost.id.get, false, currentUser.id.get)) {
+                            @b3.submit('class -> "btn btn-success btn-xs") {
+                                <span class="glyphicon glyphicon-heart"></span>
+                                @Messages("Favorite")
+                            }
+                        }
+                        </div>
+                    } else {
+                        <div>
+                        @b3.formCSRF(routes.PostController.updateFavoriteFlag(micropost.id.get, true, currentUser.id.get)) {
+                            @b3.submit('class -> "btn btn-info btn-xs") {
+                                <span class="glyphicon glyphicon-heart-empty"></span>
+                                @Messages("Favorite")
+                            }
+                        }
+                        </div>
+                    }
+                }
             </div>
         </li>
     }

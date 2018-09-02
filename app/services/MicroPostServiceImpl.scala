@@ -18,6 +18,17 @@ class MicroPostServiceImpl extends MicroPostService {
     MicroPost.deleteById(microPostId)
   }
 
+  override def updateFavoriteFlag(microPostId: Long, favoriteFlag: Boolean, favoritedId: Long)(implicit dbSession: DBSession): Try[Int] = Try {
+    MicroPost.updateFavoriteFlag(microPostId, favoriteFlag, favoritedId)
+  }
+
+  override def findByFavorite(pagination: Pagination)(
+    implicit dbSession: DBSession
+  ): Try[PagedItems[MicroPost]] = Try {
+    val size = MicroPost.countBy(sqls.eq(MicroPost.defaultAlias.favorite_flag, true))
+    PagedItems(pagination, size, findFavoritePostByWithLimitOffset()(pagination))
+  }
+
   override def findByUserId(pagination: Pagination, userId: Long)(
     implicit dbSession: DBSession
   ): Try[PagedItems[MicroPost]] =
@@ -42,6 +53,15 @@ class MicroPostServiceImpl extends MicroPostService {
     implicit dbSession: DBSession
   ): Seq[MicroPost] = MicroPost.findAllByWithLimitOffset(
     sqls.in(MicroPost.defaultAlias.userId, userIds),
+    pagination.limit,
+    pagination.offset,
+    Seq(MicroPost.defaultAlias.id.desc)
+  )
+
+  private def findFavoritePostByWithLimitOffset()(pagination: Pagination)(
+    implicit dbSession: DBSession
+  ): Seq[MicroPost] = MicroPost.findAllByWithLimitOffset(
+    sqls.eq(MicroPost.defaultAlias.favorite_flag, true),
     pagination.limit,
     pagination.offset,
     Seq(MicroPost.defaultAlias.id.desc)

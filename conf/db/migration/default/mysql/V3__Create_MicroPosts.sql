@@ -2,6 +2,8 @@ CREATE TABLE `micro_posts` (
   `id`        BIGINT                AUTO_INCREMENT,
   `user_id`   BIGINT       NOT NULL,
   `content`   VARCHAR(140) NOT NULL,
+  `favorite_flag` tinyint(1) NOT NULL default false,
+  `favorited_id` BIGINT NOT NULL,
   `create_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

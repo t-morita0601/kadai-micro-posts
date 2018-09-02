@@ -26,6 +26,20 @@ class PostController @Inject()(val userService: UserService,
     "content" -> nonEmptyText
   }
 
+  def index(page: Int): Action[AnyContent] = StackAction { implicit request =>
+    microPostService.findByFavorite(Pagination(pageSize = 10, pageNo = page))
+      .map { favorites =>
+        Ok(views.html.favorites.index(loggedIn, favorites))
+      }
+      .recover {
+        case e: Exception =>
+          Logger.error(s"occurred error", e)
+          Redirect(routes.PostController.index())
+            .flashing("failure" -> Messages("InternaError"))
+      }
+      .getOrElse(InternalServerError(Messages("InternaError")))
+  }
+
   def post(page: Int): Action[AnyContent] = StackAction { implicit request =>
     val user = loggedIn
     postForm
@@ -44,7 +58,7 @@ class PostController @Inject()(val userService: UserService,
                               content: String
                              )(implicit request: RequestHeader) = {
     val now       = ZonedDateTime.now
-    val microPost = MicroPost(None, user.id.get, content, now, now)
+    val microPost = MicroPost(None, user.id.get, content, false, 0, now, now)
     microPostService
       .create(microPost)
       .map { _ =>
@@ -80,6 +94,21 @@ class PostController @Inject()(val userService: UserService,
   def delete(microPostId: Long, page: Int): Action[AnyContent] = StackAction { implicit request =>
     microPostService
       .deleteById(microPostId)
+      .map { _ =>
+        Redirect(routes.HomeController.index(page))
+      }
+      .recover {
+        case e: Exception =>
+          Logger.error("occurred error", e)
+          Redirect(routes.HomeController.index())
+            .flashing("failure" -> Messages("InternalError"))
+      }
+      .getOrElse(InternalServerError(Messages("InternalError")))
+  }
+
+  def updateFavoriteFlag(microPostId: Long, favoriteFlag: Boolean, favoritedId: Long, page: Int): Action[AnyContent] = StackAction { implicit request =>
+    microPostService
+      .updateFavoriteFlag(microPostId, favoriteFlag, favoritedId)
       .map { _ =>
         Redirect(routes.HomeController.index(page))
       }

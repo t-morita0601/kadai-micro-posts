@@ -1,0 +1,25 @@
+@(currentUser: User, microPosts: PagedItems[MicroPost])(implicit messagesProvider: MessagesProvider, flash: Flash, request: RequestHeader)
+
+<ul class="media-list">
+    @for(microPost <- microPosts.items) {
+        @if(currentUser.id.get == microPost.favorited_id) {
+            <li class="media">
+                <div class="media-left">
+                    <img class="media-object img-rounded" src="@common.gravatarUrl(microPost.user.get.email)?s=50&amp;r=g&amp;d=identicon" alt="">
+                </div>
+                <div class="media-body">
+                    <div>
+                        <a href="@routes.UsersController.show(microPost.userId, 1)">
+                        @microPost.user.map(_.name).get</a>
+                        <span class="text-muted">posted at @microPost.createAt</span>
+                    </div>
+                    <div>
+                        <p>@microPost.content</p>
+                    </div>
+                </div>
+            </li>
+        }
+    }
+</ul>
+
+@common.pagination(microPosts, routes.PostController.index)
