@@ -2,9 +2,9 @@ package services
 
 import javax.inject.Singleton
 
-import models.User
-import scalikejdbc.{ AutoSession, DBSession }
-
+import models.{ PagedItems, User }
+import scalikejdbc._
+import skinny.Pagination
 import scala.util.Try
 
 @Singleton
@@ -20,9 +20,13 @@ class UserServiceImpl extends UserService {
       User.where('email -> email).apply().headOption
     }
 
-  // 追加
-  override def findAll(implicit dbSession: DBSession): Try[List[User]] = Try {
-    User.findAll()
+  // 変更
+  def findAll(pagination: Pagination)(implicit dbSession: DBSession = AutoSession): Try[PagedItems[User]] = Try {
+    PagedItems[User](
+      pagination,
+      User.countAllModels(),
+      User.findAllWithPagination(pagination, Seq(User.defaultAlias.id.asc))
+    )
   }
 
   // 追加
