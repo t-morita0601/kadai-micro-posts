@@ -34,10 +34,11 @@
                             <li role="separator" class="divider"></li>
                             <li>
                                 @* ログアウト用のフォームとjavascriptの追加 *@
-                                @b3.formCSRF(routes.AuthController.logout(), 'name -> "logout", 'style -> "display: none") {
-                                    @b3.submit() { @Messages("LogOut") }
+                                @b3.formCSRF(routes.AuthController.logout(), 'name -> "logout", 'style -> "margin: 15px;") {
+                                    @b3.submit('class -> "btn btn-primary btn-block") {
+                                        @Messages("LogOut")
+                                    }
                                 }
-                                <a href="#" onclick="document.logout.submit();">@Messages("LogOut")</a>
                             </li>
                         </ul>
                     </li>
